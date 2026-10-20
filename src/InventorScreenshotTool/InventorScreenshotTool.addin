@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Addin Type="Standard">
+  <ClassId>{9DB7878B-E3CC-456E-9769-75DA28AF669A}</ClassId>
+  <ClientId>{9DB7878B-E3CC-456E-9769-75DA28AF669A}</ClientId>
+  <DisplayName>Autodesk Inventor Better Screenshot Tool - By CalumK</DisplayName>
+  <Description>White-background PNG screenshots with preview. By CalumK - https://calumk.com</Description>
+  <Assembly>InventorScreenshotTool.dll</Assembly>
+  <OSType>Win64</OSType>
+  <LoadAutomatically>1</LoadAutomatically>
+  <LoadOnStartUp>1</LoadOnStartUp>
+  <UserUnloadable>1</UserUnloadable>
+  <Hidden>0</Hidden>
+  <SupportedSoftwareVersionGreaterThan>28..</SupportedSoftwareVersionGreaterThan>
+  <DataVersion>1</DataVersion>
+  <LoadBehavior>2</LoadBehavior>
+  <UserInterfaceVersion>1</UserInterfaceVersion>
+</Addin>

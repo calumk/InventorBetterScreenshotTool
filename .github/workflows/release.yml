@@ -1,0 +1,82 @@
+name: Build and publish installer
+
+# Only tags explicitly pushed by a maintainer run the self-hosted build.
+# Do NOT enable self-hosted builds for pull_request events on public repositories.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compile Inventor 2025 add-in
+    runs-on: [self-hosted, Windows, X64, inventor-2025]
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Check source version against tag
+        shell: pwsh
+        run: |
+          $project = [xml](Get-Content 'src/InventorScreenshotTool/InventorScreenshotTool.csproj' -Raw)
+          $version = [string]$project.Project.PropertyGroup.Version
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -ne "v$version") {
+            throw "Tag '$env:GITHUB_REF_NAME' does not match project version v$version"
+          }
+      - name: Build and stage release payload
+        shell: pwsh
+        run: ./scripts/package.ps1
+      - name: Publish plugin files for packaging
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventor-plugin-payload
+          path: artifacts/plugin/*
+          if-no-files-found: error
+          retention-days: 7
+
+  installer:
+    name: Package Windows installer
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: inventor-plugin-payload
+          path: artifacts/plugin
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+      - name: Build setup EXE
+        shell: pwsh
+        run: |
+          $project = [xml](Get-Content 'src/InventorScreenshotTool/InventorScreenshotTool.csproj' -Raw)
+          $version = [string]$project.Project.PropertyGroup.Version
+          $iscc = (Get-Command ISCC.exe -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source)
+          if (-not $iscc) { $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
+          if (-not (Test-Path $iscc)) { throw "ISCC.exe not found at '$iscc'; Inno Setup installation failed." }
+          & $iscc "/DAppVersion=$version" 'installer/BetterScreenshot.iss'
+          if ($LASTEXITCODE -ne 0) { throw 'Inno Setup failed.' }
+          $exe = "artifacts/installer/InventorBetterScreenshotTool-Setup-v$version.exe"
+          if (-not (Test-Path $exe)) { throw "Missing installer: $exe" }
+      - name: Store installer workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BetterScreenshotTool-Windows-Installer
+          path: artifacts/installer/*.exe
+          if-no-files-found: error
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: artifacts/installer/*.exe

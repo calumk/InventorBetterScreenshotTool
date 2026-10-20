@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <OutputType>Library</OutputType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>InventorScreenshotTool</AssemblyName>
+    <RootNamespace>InventorScreenshotTool</RootNamespace>
+    <Version>0.3.1</Version>
+    <InventorBin Condition="'$(InventorBin)' == ''">$(ProgramFiles)\Autodesk\Inventor 2025\Bin</InventorBin>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets/cube-focus-16.png" LogicalName="InventorScreenshotTool.Assets.cube-focus-16.png" />
+    <EmbeddedResource Include="Assets/cube-focus-32.png" LogicalName="InventorScreenshotTool.Assets.cube-focus-32.png" />
+    <EmbeddedResource Include="Assets/cube-focus-48.png" LogicalName="InventorScreenshotTool.Assets.cube-focus-48.png" />
+    <EmbeddedResource Include="Assets/BetterScreenshot.ico" LogicalName="InventorScreenshotTool.Assets.BetterScreenshot.ico" />
+  </ItemGroup>
+
+  <!-- Local reference supplied by the user's Autodesk Inventor installation. -->
+  <ItemGroup>
+    <Reference Include="Autodesk.Inventor.Interop">
+      <HintPath>$(InventorBin)\Autodesk.Inventor.Interop.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CheckInventorInterop" BeforeTargets="ResolveReferences"
+          Condition="!Exists('$(InventorBin)\Autodesk.Inventor.Interop.dll')">
+    <Error Text="Inventor interop not found at $(InventorBin)\Autodesk.Inventor.Interop.dll. Install Inventor 2025 or pass -p:InventorBin=YOUR_PATH." />
+  </Target>
+</Project>
