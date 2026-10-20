@@ -1,4 +1,4 @@
-# Autodesk Inventor Better Screenshot Tool — By CalumK
+# Autodesk Inventor Better Screenshot Tool
 
 **Version 0.3.1** · **Autodesk Inventor 2025.2.1+** · **Windows x64** · [calumk.com](https://calumk.com)
 
