@@ -6,6 +6,12 @@ A lightweight Inventor ribbon add-in for clean **white-background PNG screenshot
 
 This is an **independent community tool**, not an official Autodesk product. Uses the Phosphor Icons `cube-focus` duotone icon with the accompanying MIT license in `src/InventorScreenshotTool/Assets/`.
 
+## Screenshots
+
+![Better Screenshots ribbon tab in Inventor](screenshots/ribbon.png)
+
+![Better Screenshot Tool dialog with export settings and preview](screenshots/ui.png)
+
 ## Screenshot behaviour
 
 When capturing `D:\Jobs\Widget\Bracket.ipt`, the default output is:
